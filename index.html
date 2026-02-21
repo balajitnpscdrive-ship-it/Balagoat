@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DBPC G.O.A.T.S V3.2</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#fbff00">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=Great+Vibes&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    :root { --bosco: #ff0055; --savio: #00d4ff; --ruva: #ffcc00; --thomas: #00ff88; --neon: #fbff00; }
+    body { font-family: 'Poppins', sans-serif; margin: 0; background: #000 center/cover fixed; color: white; min-height: 100vh; overflow-x: hidden; }
+    .glass { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin: 10px; }
+    .header { display: flex; flex-direction: column; align-items: center; padding: 15px; border-bottom: 2px solid var(--savio); background: rgba(0,0,0,0.9); position: sticky; top: 0; z-index: 100; }
+    input, select { width: 100%; padding: 12px; margin: 8px 0; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 12px; font-size: 16px; }
+    .house-btn { padding: 22px; border-radius: 15px; border: none; font-weight: 900; color: #000; cursor: pointer; font-size: 16px; }
+    .h-bosco { background: var(--bosco); } .h-savio { background: var(--savio); } .h-ruva { background: var(--ruva); } .h-thomas { background: var(--thomas); }
+    .btn-main { width: 100%; padding: 16px; border-radius: 12px; background: var(--neon); color: black; font-weight: 900; border: none; cursor: pointer; }
+    .stat-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--neon); }
+    .rank-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neon); color: black; padding: 15px 30px; border-radius: 50px; display: none; z-index: 5000; font-weight: 900; }
+    #reader { width: 100%; border-radius: 20px; display: none; margin: 15px 0; overflow: hidden; border: 3px solid var(--neon); }
+
+    /* PDF TEMPLATE */
+    #cert-template { 
+      width: 1000px; height: 700px; background: white; color: black; 
+      position: absolute; left: -9999px; padding: 60px; box-sizing: border-box; 
+      border: 20px solid #8e6d10; outline: 5px solid #8e6d10; outline-offset: -35px;
+    }
+    .cert-header { display: flex; justify-content: space-between; align-items: center; }
+    .cert-body { text-align: center; margin-top: 30px; }
+    .cert-award { font-family: 'Great Vibes', cursive; font-size: 65px; color: #8e6d10; margin: 10px 0; }
+    .cert-name { font-size: 50px; border-bottom: 3px solid black; display: inline-block; padding: 0 40px; margin: 10px 0; font-weight: bold; }
+    .cert-footer { display: flex; justify-content: space-between; margin-top: 80px; font-weight: bold; border-top: 2px solid #eee; padding-top: 20px; }
+  </style>
+</head>
+<body onload="initApp()">
+  <div id="toast"></div>
+
+  <div class="header">
+    <div style="display:flex; gap:15px;"><img id="main-logo" style="height:50px;"><img id="main-founder" style="height:60px; width:60px; border-radius:50%; border:2px solid var(--neon);"></div>
+    <div style="font-weight:900; text-align:center; font-size:13px; margin-top:8px;">DON BOSCO POLYTECHNIC COLLEGE<br><span style="color:var(--neon)">G.O.A.T.S V3.2</span></div>
+  </div>
+
+  <div id="login-view" class="glass" style="max-width:380px; margin: 50px auto;">
+    <select id="user-select"><option disabled selected>Connecting...</option></select>
+    <input type="password" id="pass-input" placeholder="Password">
+    <button class="btn-main" onclick="login()">LOGIN</button>
+  </div>
+
+  <div id="teacher-view" style="display:none;" class="glass">
+    <div style="text-align:center; color:var(--neon); font-weight:900; margin-bottom:15px; background:rgba(255,255,255,0.1); padding:8px; border-radius:10px;">DEPT: <span id="active-dept-label">-</span></div>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px;">
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-bottom:4px solid var(--bosco)">BOSCO<br><b id="s-Bosco" style="font-size:20px;">0</b></div>
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-bottom:4px solid var(--savio)">SAVIO<br><b id="s-Savio" style="font-size:20px;">0</b></div>
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-bottom:4px solid var(--ruva)">RUVA<br><b id="s-Ruva" style="font-size:20px;">0</b></div>
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-bottom:4px solid var(--thomas)">THOMAS<br><b id="s-Thomas" style="font-size:20px;">0</b></div>
+    </div>
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+      <button class="btn-main" id="btn-neg" onclick="setMode('Negative')" style="background:#ff416c; color:white;">-5 PTS</button>
+      <button class="btn-main" id="btn-pos" onclick="setMode('Positive')" style="background:#00b09b; color:white; border: 3px solid var(--neon);">+10 PTS</button>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+      <button class="house-btn h-bosco" onclick="processEntry('House Entry', 'Bosco')">BOSCO</button>
+      <button class="house-btn h-savio" onclick="processEntry('House Entry', 'Savio')">SAVIO</button>
+      <button class="house-btn h-ruva" onclick="processEntry('House Entry', 'Ruva')">RUVA</button>
+      <button class="house-btn h-thomas" onclick="processEntry('House Entry', 'Thomas')">THOMAS</button>
+    </div>
+    <button id="cam-btn" onclick="toggleCamera()" style="background:var(--neon); border:none; padding:18px; border-radius:50px; font-weight:900; width:100%; color:black;">📸 START SCANNING</button>
+    <div id="reader"></div>
+    <input type="text" id="t-name" placeholder="Teacher Name">
+    <select id="p-cat"><option>Quiz/Program</option><option>Sports</option><option>Discipline</option><option>Academics</option></select>
+    <button class="btn-main" style="background:#222; color:white; margin-top:10px;" onclick="location.reload()">LOGOUT</button>
+  </div>
+
+  <div id="admin-view" style="display:none;" class="glass">
+    <h2 style="text-align:center; color:var(--neon);">HALL OF FAME</h2>
+    <div id="admin-content"></div>
+    <button class="btn-main" onclick="location.reload()">LOGOUT ADMIN</button>
+  </div>
+
+  <div id="cert-template">
+    <div class="cert-header">
+      <img id="cert-logo" style="height:110px;">
+      <div style="text-align:center;">
+        <h1 style="font-family:'Cinzel'; margin:0; font-size:28px;">DON BOSCO</h1>
+        <h3 style="margin:0; font-size:18px; letter-spacing:2px;">POLYTECHNIC COLLEGE</h3>
+      </div>
+      <img id="cert-founder" style="height:110px; width:110px; border-radius:50%; object-fit:cover;">
+    </div>
+    <div class="cert-body">
+      <p style="font-size:22px; margin-bottom:10px;">This Prestigious Certificate is awarded to</p>
+      <div id="pdf-name" class="cert-name"></div>
+      <p style="font-size:22px;">for outstanding merit and distinction as the</p>
+      <div id="pdf-award" class="cert-award"></div>
+      <p id="pdf-desc" style="font-size:19px; font-style:italic; padding:0 80px; color:#444;"></p>
+    </div>
+    <div class="cert-footer"><span>Date: ${new Date().toLocaleDateString()}</span><span>SIGNATURE</span><span>PRINCIPAL</span></div>
+  </div>
+
+  <script>
+    // UPDATED SCRIPT URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyf4iiQPpnZ7mi7E1Oha9Ze-ebGVUugiz0YPDedvbv-8yemvAeqyErNFjo3v0j7ME2og/exec";
+    
+    let html5QrCode = null, scores = { Bosco:0, Savio:0, Ruva:0, Thomas:0 }, currentMode = "Positive", currentDept = "";
+
+    async function api(action, data = {}) {
+      try {
+        const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action, data }) });
+        return res.json();
+      } catch (e) { console.error("API Error", e); }
+    }
+
+    async function initApp() {
+      const imgs = await api('getImages');
+      if(imgs) {
+        document.body.style.backgroundImage = `url('${imgs.thumbBg}')`;
+        document.getElementById('main-logo').src = imgs.thumbLogo;
+        document.getElementById('main-founder').src = imgs.thumbFounder;
+        document.getElementById('cert-logo').src = imgs.fullLogo;
+        document.getElementById('cert-founder').src = imgs.fullFounder;
+      }
+      const depts = await api('getDepts');
+      let s = document.getElementById('user-select');
+      s.innerHTML = '<option disabled selected>Select Department</option>';
+      if(depts) depts.forEach(d => s.add(new Option(d, d)));
+    }
+
+    async function login() {
+      const u = document.getElementById('user-select').value, p = document.getElementById('pass-input').value;
+      const r = await api('login', { u, p });
+      if(r && r.success) {
+        document.getElementById('login-view').style.display='none';
+        if(r.role === 'Admin') { document.getElementById('admin-view').style.display='block'; loadAdmin(); }
+        else { document.getElementById('teacher-view').style.display='block'; currentDept = r.dept; document.getElementById('active-dept-label').innerText = r.dept; }
+      } else alert("Invalid Login");
+    }
+
+    function setMode(m) { 
+        currentMode = m; 
+        document.getElementById('btn-pos').style.border = m==='Positive'?'3px solid var(--neon)':'none';
+        document.getElementById('btn-neg').style.border = m==='Negative'?'3px solid var(--neon)':'none';
+    }
+
+    function processEntry(sName, house) {
+      const tName = document.getElementById('t-name').value;
+      if(!tName) return alert("Teacher Name Required!");
+      
+      const pts = (currentMode === 'Positive') ? 10 : -5;
+      
+      // Safety check for house name
+      if(scores.hasOwnProperty(house)) {
+          scores[house] += pts;
+          document.getElementById('s-' + house).innerText = scores[house];
+          showToast(`${sName} (${house}): ${pts} PTS`);
+          if(pts > 0) confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+          api('submit', { dept: currentDept, studentName: sName, teacherName: tName, category: document.getElementById('p-cat').value, house: house, type: currentMode });
+      } else {
+          alert("House not recognized: " + house);
+      }
+    }
+
+    async function toggleCamera() {
+      const rd = document.getElementById('reader');
+      const btn = document.getElementById('cam-btn');
+      if (html5QrCode && html5QrCode.isScanning) { await html5QrCode.stop(); rd.style.display='none'; btn.innerText = "📸 START SCANNING"; return; }
+      rd.style.display='block'; btn.innerText = "⏹️ STOP";
+      if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: 280 }, (text) => {
+        
+        // UPDATED: Parsing Name|Dept|House
+        const p = text.split('|'); 
+        if(p.length >= 3) { 
+            const studentName = p[0].trim();
+            const houseRaw = p[2].trim();
+            // Format to Title Case (e.g. "BOSCO" -> "Bosco")
+            const formattedHouse = houseRaw.charAt(0).toUpperCase() + houseRaw.slice(1).toLowerCase();
+            
+            processEntry(studentName, formattedHouse); 
+            toggleCamera(); // Stop camera after successful scan
+        } else {
+            showToast("Invalid QR Format");
+        }
+      }).catch(err => alert("Camera Error"));
+    }
+
+    async function loadAdmin() {
+      const d = await api('getAdmin');
+      if(!d) return;
+      document.getElementById('admin-content').innerHTML = `
+        <div class="stat-card" style="background:var(--neon); color:black;">
+            <h4>🏆 ACTIVE DEPT OF THE WEEK</h4>
+            <h2 style="margin:0">${d.activeDeptWinner}</h2>
+        </div>
+        <div class="stat-card"><h4>🏛️ ANNUAL HOUSE PODIUM</h4>
+            <div class="rank-row">🥇 Winner: <b>${d.annualHouses[0][0]}</b></div>
+            <div class="rank-row">🥈 Runner: ${d.annualHouses[1][0]}</div>
+            <div class="rank-row">🥉 2nd Runner: ${d.annualHouses[2][0]}</div>
+        </div>
+        <div class="stat-card"><h4>👤 ANNUAL STUDENT TOP 3 (PER DEPT)</h4>
+          ${d.annualTop3.map(dept => `
+            <div style="margin-bottom:10px; border-bottom:1px solid #333;">
+              <b style="color:var(--neon)">${dept.dept}</b>
+              <div class="rank-row">🥇 Winner: ${dept.winners[0][0]} <button class="btn-main" style="width:auto; padding:3px 8px; font-size:10px;" onclick="genPDF('${dept.winners[0][0]}','Annual Winner','Highest merit in ${dept.dept} for the academic year.')">CERT</button></div>
+              ${dept.winners[1] ? `<div class="rank-row">🥈 Runner: ${dept.winners[1][0]} <button class="btn-main" style="width:auto; padding:3px 8px; font-size:10px;" onclick="genPDF('${dept.winners[1][0]}','Annual Runner','Distinguished performance in ${dept.dept}.')">CERT</button></div>`:''}
+              ${dept.winners[2] ? `<div class="rank-row">🥉 2nd Runner: ${dept.winners[2][0]} <button class="btn-main" style="width:auto; padding:3px 8px; font-size:10px;" onclick="genPDF('${dept.winners[2][0]}','2nd Runner Up','Excellence in conduct and house participation.')">CERT</button></div>`:''}
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    async function genPDF(n, a, desc) {
+      document.getElementById('pdf-name').innerText = n; 
+      document.getElementById('pdf-award').innerText = a;
+      document.getElementById('pdf-desc').innerText = desc;
+      const canvas = await html2canvas(document.getElementById('cert-template'), { scale: 2 });
+      const pdf = new jspdf.jsPDF('l', 'mm', 'a4');
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 297, 210);
+      pdf.save(n + "_Annual_Award.pdf");
+    }
+
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display='block'; setTimeout(()=>t.style.display='none', 3000); }
+  </script>
+</body>
+</html>
