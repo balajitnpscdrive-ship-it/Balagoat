@@ -11,309 +11,181 @@
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     :root { --bosco: #ff0055; --savio: #00d4ff; --ruva: #ffcc00; --thomas: #00ff88; --neon: #fbff00; }
-    body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #000; background-size: cover; background-position: center; background-attachment: fixed; color: white; min-height: 100vh; }
+    body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #000; color: white; min-height: 100vh; background-size: cover; background-attachment: fixed; }
     .glass { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin: 10px; }
     .header { display: flex; flex-direction: column; align-items: center; padding: 15px; border-bottom: 2px solid var(--savio); background: rgba(0,0,0,0.9); position: sticky; top: 0; z-index: 100; }
     .logo-img { height: 45px; } .founder-img { height: 55px; width: 55px; border-radius: 50%; border: 2px solid var(--neon); object-fit: cover; }
-    input, select { width: 100%; padding: 12px; margin: 8px 0; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
-    .house-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-    .house-btn { padding: 20px; border-radius: 15px; border: none; font-weight: 900; color: #000; cursor: pointer; font-size: 16px; transition: transform 0.1s; }
-    .house-btn:active { transform: scale(0.95); }
-    .h-bosco { background: var(--bosco); } .h-savio { background: var(--savio); } .h-ruva { background: var(--ruva); } .h-thomas { background: var(--thomas); }
-    .btn-main { width: 100%; padding: 14px; border-radius: 12px; background: var(--neon); color: black; font-weight: 900; border: none; cursor: pointer; }
-    .type-btn { flex: 1; padding: 15px; border-radius: 12px; font-weight: 900; cursor: pointer; border: 3px solid transparent; }
+    input, select { width: 100%; padding: 14px; margin: 8px 0; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+    .house-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
+    .house-btn { padding: 25px 10px; border-radius: 15px; border: none; font-weight: 900; color: #000; cursor: pointer; transition: 0.1s; font-size: 14px; text-transform: uppercase; }
+    .house-btn:active { transform: scale(0.92); filter: brightness(1.2); }
+    .h-bosco { background: var(--bosco); box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3); } 
+    .h-savio { background: var(--savio); box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); } 
+    .h-ruva { background: var(--ruva); box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3); } 
+    .h-thomas { background: var(--thomas); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3); }
+    .btn-main { width: 100%; padding: 16px; border-radius: 12px; background: var(--neon); color: black; font-weight: 900; border: none; cursor: pointer; margin-top: 10px; }
     .stat-card { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--neon); }
-    .rank-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .btn-cert { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 10px; }
-    #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--neon); color: black; padding: 12px 25px; border-radius: 50px; display: none; z-index: 3000; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-    
-    /* Certificate Styles */
-    #cert-template { width: 800px; height: 560px; background: white; color: black; position: absolute; left: -9999px; padding: 30px; text-align: center; border: 15px double #8e6d10; box-sizing: border-box; }
-    .sig-box { display: flex; justify-content: space-between; margin-top: 50px; padding: 0 50px; }
+    .rank-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    #cert-template { width: 800px; height: 560px; background: white; color: black; position: absolute; left: -9999px; padding: 40px; text-align: center; border: 15px double #8e6d10; box-sizing: border-box; }
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 9999; }
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neon); color: black; padding: 12px 30px; border-radius: 50px; display: none; z-index: 3000; font-weight: bold; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
   </style>
 </head>
 <body onload="initApp()">
-
-  <div id="loading" class="loading-overlay">
-    <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--neon); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
-    <p style="margin-top:15px; font-weight:bold;">Syncing with Server...</p>
-  </div>
-  <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-
+  <div id="loading" class="loading-overlay"><b style="color:var(--neon)">Syncing Data...</b></div>
   <div id="toast"></div>
 
   <div class="header">
     <div style="display:flex; gap:15px;"><img id="main-logo" class="logo-img"><img id="main-founder" class="founder-img"></div>
-    <div style="font-weight:900; font-size:14px; margin-top:5px; text-align:center;">DON BOSCO POLYTECHNIC COLLEGE<br><span style="color:var(--neon); font-size:11px;">G.O.A.T.S</span></div>
+    <div style="font-weight:900; font-size:14px; margin-top:5px; text-align:center;">DON BOSCO POLYTECHNIC COLLEGE<br><span style="color:var(--neon); font-size:11px;">G.O.A.T.S MANAGEMENT</span></div>
   </div>
 
   <div id="login-view" class="glass" style="max-width:350px; margin: 40px auto;">
     <select id="user-select"><option disabled selected>Connecting...</option></select>
-    <input type="password" id="pass-input" placeholder="Access Password">
-    <button class="btn-main" onclick="login()">LOGIN TO DASHBOARD</button>
+    <input type="password" id="pass-input" placeholder="Password">
+    <button class="btn-main" onclick="login()">LOGIN</button>
   </div>
 
   <div id="teacher-view" style="display:none;" class="glass">
-    <div style="text-align:center; color:var(--neon); font-weight:900; margin-bottom:10px;">DEPT: <span id="active-dept-label">-</span></div>
-    
-    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:15px;">
-      <div style="text-align:center; font-size:10px; background:#111; padding:8px; border-radius:10px; border-top:4px solid var(--bosco)">BOSCO<br><b id="s-Bosco" style="font-size:14px;">0</b></div>
-      <div style="text-align:center; font-size:10px; background:#111; padding:8px; border-radius:10px; border-top:4px solid var(--savio)">SAVIO<br><b id="s-Savio" style="font-size:14px;">0</b></div>
-      <div style="text-align:center; font-size:10px; background:#111; padding:8px; border-radius:10px; border-top:4px solid var(--ruva)">RUVA<br><b id="s-Ruva" style="font-size:14px;">0</b></div>
-      <div style="text-align:center; font-size:10px; background:#111; padding:8px; border-radius:10px; border-top:4px solid var(--thomas)">THOMAS<br><b id="s-Thomas" style="font-size:14px;">0</b></div>
+    <div style="text-align:center; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 10px; margin-bottom: 15px;">
+      <span style="font-size: 12px; opacity: 0.7;">DEPARTMENT</span><br>
+      <b style="color:var(--neon); letter-spacing: 1px;" id="active-dept-label">-</b>
     </div>
 
     <div style="display:flex; gap:10px; margin-bottom:15px;">
-      <button class="type-btn" id="btn-neg" onclick="setMode('Negative')" style="background:#ff416c; color:white;">-5 PTS</button>
-      <button class="type-btn" id="btn-pos" onclick="setMode('Positive')" style="background:#00b09b; color:white; border-color:var(--neon);">+10 PTS</button>
-    </div>
-
-    <div class="house-grid">
-      <button class="house-btn h-bosco" onclick="processEntry('HOUSE_WINNER', 'Bosco')">BOSCO</button>
-      <button class="house-btn h-savio" onclick="processEntry('HOUSE_WINNER', 'Savio')">SAVIO</button>
-      <button class="house-btn h-ruva" onclick="processEntry('HOUSE_WINNER', 'Ruva')">RUVA</button>
-      <button class="house-btn h-thomas" onclick="processEntry('HOUSE_WINNER', 'Thomas')">THOMAS</button>
-    </div>
-
-    <div style="border-top: 1px solid #333; margin: 15px 0; padding-top: 15px;">
-      <input type="text" id="m-student" placeholder="Manual Student Name">
-      <select id="m-house">
-        <option disabled selected>Select Student House</option>
-        <option>Bosco</option><option>Savio</option><option>Ruva</option><option>Thomas</option>
-      </select>
-      <button onclick="submitManual()" style="width:100%; background:#333; color:white; border:none; padding:12px; border-radius:8px; margin-bottom:15px; font-weight:bold;">SUBMIT MANUAL ENTRY</button>
-    </div>
-
-    <button id="cam-btn" onclick="toggleCamera()" style="background:var(--neon); border:none; padding:15px; border-radius:50px; font-weight:900; width:100%; font-size:16px;">SCAN QR CODE</button>
-    <div id="reader" style="width:100%; border-radius:15px; overflow:hidden; border:2px solid var(--neon); display:none; margin:15px 0;"></div>
-
-    <div style="margin-top: 20px;">
-      <input type="text" id="t-name" placeholder="Teacher/Staff Name">
-      <select id="p-cat">
-        <option>Quiz/Program</option>
-        <option>YouTube Contribution</option>
-        <option>Assembly Contribution</option>
-        <option>Extra Activities</option>
-        <option>Discipline</option>
-        <option>Academics</option>
-        <option>Sports</option>
-      </select>
+      <button onclick="setMode('Negative', this)" id="btn-neg" style="flex:1; padding:18px; border-radius:12px; background:#333; border:2px solid #ff416c; color:white; font-weight:bold;">-5 FINE</button>
+      <button onclick="setMode('Positive', this)" id="btn-pos" style="flex:1; padding:18px; border-radius:12px; background:#00b09b; border:2px solid transparent; color:white; font-weight:bold;">+10 AWARD</button>
     </div>
     
-    <button class="btn-main" style="background:#222; color:white; margin-top:20px;" onclick="logout()">LOGOUT</button>
+    <div id="reader" style="width:100%; display:none; border-radius:15px; overflow:hidden; margin-bottom:10px; border: 2px solid var(--neon);"></div>
+    <button class="btn-main" id="cam-btn" onclick="toggleCamera()" style="background:#444; color:white; margin-bottom:15px; border: 1px solid #666;">📸 OPEN SCANNER</button>
+    
+    <input type="text" id="m-student" placeholder="Manual Name Entry">
+    
+    <div class="house-grid">
+      <button class="house-btn h-bosco" onclick="submit('Bosco')">BOSCO</button>
+      <button class="house-btn h-savio" onclick="submit('Savio')">SAVIO</button>
+      <button class="house-btn h-ruva" onclick="submit('Ruva')">RUVA</button>
+      <button class="house-btn h-thomas" onclick="submit('Thomas')">THOMAS</button>
+    </div>
+    
+    <input type="text" id="t-name" placeholder="Teacher Name">
+    <select id="p-cat"><option>Academics</option><option>Quiz/Program</option><option>YouTube</option><option>Discipline</option><option>Sports</option></select>
+    <button class="btn-main" style="background:#222; color:white; margin-top:30px;" onclick="location.reload()">LOGOUT</button>
   </div>
 
   <div id="admin-view" style="display:none;" class="glass">
     <div id="admin-content"></div>
-    <button class="btn-main" onclick="logout()" style="margin-top:20px;">LOGOUT</button>
+    <button class="btn-main" onclick="location.reload()" style="margin-top:20px;">LOGOUT</button>
   </div>
 
   <div id="cert-template">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <img id="cert-logo" style="height:80px;">
-      <img id="cert-founder" style="height:80px; border-radius:50%;">
-    </div>
-    <h1 style="font-size:32px; margin:20px 0 0 0;">DON BOSCO POLYTECHNIC COLLEGE</h1>
-    <h2 style="font-family:'Great Vibes'; font-size:55px; color:#8e6d10; margin:5px 0;">Certificate of Achievement</h2>
-    <p style="font-size:18px;">This is to certify that</p>
-    <h2 id="pdf-name" style="font-size:42px; text-decoration:underline; margin:10px 0;"></h2>
-    <p style="font-size:18px;">has been recognized as the</p>
-    <h3 id="pdf-award" style="font-size:28px; color:#8e6d10; margin:10px 0;"></h3>
-    <div class="sig-box">
-      <div style="border-top:2px solid #333; width:150px; padding-top:5px;"><b>AUTHORIZED SIGN</b></div>
-      <div style="border-top:2px solid #333; width:150px; padding-top:5px;"><b>PRINCIPAL SIGN</b></div>
+    <h1 style="margin:0; font-size:30px;">DON BOSCO POLYTECHNIC COLLEGE</h1>
+    <h2 style="font-family:'Great Vibes'; font-size:55px; color:#8e6d10; margin:15px 0;">Certificate of Achievement</h2>
+    <p style="font-size:18px;">This is awarded to</p>
+    <h1 id="cert-name" style="font-size:40px; text-decoration:underline; margin:10px 0;"></h1>
+    <p style="font-size:18px;">of <b id="cert-house"></b> House</p>
+    <p style="font-size:18px;">for being the Weekly Topper in the Department of</p>
+    <h2 id="cert-dept" style="color:#8e6d10;"></h2>
+    <div style="margin-top:40px; display:flex; justify-content: space-around;">
+      <span>_________________<br>HOD</span>
+      <span>_________________<br>Principal</span>
     </div>
   </div>
 
   <script>
-    // YOUR DEPLOYED APPS SCRIPT URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMqEBQNCi5QGNR0lyUadkoPxBTDLELSLu0ku5W7eaCpgW9joBSeZ3AgIdewAgRvJsw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytgdtCX1pm82A0XHGpPDouny2nEWSWG_6qWfOgDgs5vXe0ys9T4nCa2dsPPLbxjtX7/exec";
+    let curMode = "Positive", curDept = "", html5Qr = null;
 
-    let html5QrCode = null, scanActive = false;
-    let scores = { Bosco:0, Savio:0, Ruva:0, Thomas:0 }, currentMode = "Positive", currentDept = "";
-
-    // Fix for Google Apps Script CORS/Redirect
-    async function callAPI(payload) {
-      document.getElementById('loading').style.display = 'flex';
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors', // Bypasses CORS but cannot read response
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        
-        // Note: 'no-cors' means we can't read 'response.json()'. 
-        // We use a workaround: for read-only actions, we use a different approach if needed.
-        // However, for Google Scripts, it's better to use JSONP or standard Fetch if the script is deployed as 'Anyone'.
-        
-        // Re-trying with standard fetch (works when script returns ContentService)
-        const realResponse = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        const result = await realResponse.json();
-        document.getElementById('loading').style.display = 'none';
-        return result;
-      } catch (e) {
-        document.getElementById('loading').style.display = 'none';
-        console.error("Fetch error:", e);
-      }
+    async function api(p, s=false) {
+      if(!s) document.getElementById('loading').style.display = 'flex';
+      const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(p) });
+      const d = await r.json();
+      if(!s) document.getElementById('loading').style.display = 'none';
+      return d;
     }
 
     async function initApp() {
-      const res = await callAPI({ action: 'getInitialData' });
-      if (res) {
-        document.body.style.backgroundImage = `url('${res.images.thumbBg}')`;
-        document.getElementById('main-logo').src = res.images.thumbLogo;
-        document.getElementById('main-founder').src = res.images.thumbFounder;
-        document.getElementById('cert-logo').src = res.images.fullLogo;
-        document.getElementById('cert-founder').src = res.images.fullFounder;
-
-        let s = document.getElementById('user-select'); 
-        s.innerHTML = '<option disabled selected>Select Department</option>';
-        res.departments.forEach(d => s.add(new Option(d, d)));
-      }
-    }
-
-    function setMode(m) {
-      currentMode = m;
-      document.getElementById('btn-pos').style.borderColor = (m === 'Positive') ? 'var(--neon)' : 'transparent';
-      document.getElementById('btn-neg').style.borderColor = (m === 'Negative') ? 'var(--neon)' : 'transparent';
+      const d = await api({ action: 'getInitialData' });
+      document.body.style.backgroundImage = `url('${d.images.thumbBg}')`;
+      document.getElementById('main-logo').src = d.images.thumbLogo;
+      document.getElementById('main-founder').src = d.images.thumbFounder;
+      let s = document.getElementById('user-select'); s.innerHTML = '<option disabled selected>Select Dept</option>';
+      d.departments.forEach(dept => s.add(new Option(dept, dept)));
     }
 
     async function login() {
-      const u = document.getElementById('user-select').value;
-      const p = document.getElementById('pass-input').value;
-      if(!u || !p) return alert("Select Dept and Enter Password");
-
-      const r = await callAPI({ action: 'login', user: u, pass: p });
+      const u = document.getElementById('user-select').value, p = document.getElementById('pass-input').value;
+      const r = await api({ action: 'login', user: u, pass: p });
       if(r && r.success) {
         document.getElementById('login-view').style.display='none';
-        if(r.role === 'Admin') { 
-          document.getElementById('admin-view').style.display='block'; 
-          loadAdmin(); 
-        } else { 
-          document.getElementById('teacher-view').style.display='block'; 
-          currentDept = r.dept;
-          document.getElementById('active-dept-label').innerText = r.dept;
-        }
-      } else alert("Invalid Credentials");
+        if(r.role === 'Admin') { document.getElementById('admin-view').style.display='block'; loadAdmin(); }
+        else { document.getElementById('teacher-view').style.display='block'; curDept = r.dept; document.getElementById('active-dept-label').innerText = r.dept; }
+      } else alert("Invalid Password");
     }
 
-    async function toggleCamera() {
-      const rd = document.getElementById('reader');
-      const btn = document.getElementById('cam-btn');
-      if (!scanActive) {
-        rd.style.display = 'block';
-        btn.innerText = 'STOP CAMERA';
-        try {
-          html5QrCode = new Html5Qrcode("reader");
-          const config = { fps: 20, qrbox: { width: 250, height: 250 } };
-          await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
-            const parts = decodedText.split('|');
-            // Expected Format: Name|ID|House
-            if(parts.length >= 3) { 
-              processEntry(parts[0], parts[2]); 
-              stopCam(); 
-            } else {
-              showToast("Invalid QR Format");
-            }
-          });
-          scanActive = true;
-        } catch (e) {
-          alert("Camera Error: Please ensure you are on HTTPS and granted permission.");
-          stopCam();
-        }
-      } else { stopCam(); }
+    function setMode(m, btn) {
+      curMode = m;
+      document.getElementById('btn-neg').style.background = m === 'Negative' ? '#ff416c' : '#333';
+      document.getElementById('btn-neg').style.borderColor = m === 'Negative' ? 'transparent' : '#ff416c';
+      document.getElementById('btn-pos').style.background = m === 'Positive' ? '#00b09b' : '#333';
+      document.getElementById('btn-pos').style.borderColor = m === 'Positive' ? 'transparent' : '#00b09b';
     }
 
-    async function stopCam() {
-      if (html5QrCode) {
-        try { if(html5QrCode.isScanning) await html5QrCode.stop(); await html5QrCode.clear(); } catch(e){}
-      }
-      document.getElementById('reader').style.display = 'none';
-      document.getElementById('cam-btn').innerText = 'SCAN QR CODE';
-      scanActive = false;
-    }
-
-    function submitManual() {
-      const n = document.getElementById('m-student').value;
-      const h = document.getElementById('m-house').value;
-      if(!n || h.includes("Select")) return alert("Please fill Student Name and House");
-      processEntry(n, h); 
+    function submit(house) {
+      const name = document.getElementById('m-student').value;
+      const teacher = document.getElementById('t-name').value;
+      if(!name || !teacher) return alert("Enter Student & Teacher Name");
+      showToast("✓ Record Logged!");
+      if(curMode === 'Positive') confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+      api({ action: 'submitPoint', data: { dept: curDept, studentName: name, teacherName: teacher, category: document.getElementById('p-cat').value, house: house, type: curMode } }, true);
       document.getElementById('m-student').value = "";
     }
 
-    async function processEntry(sName, house) {
-      const tName = document.getElementById('t-name').value; 
-      if(!tName) return alert("Please enter your (Teacher) name first!");
-      
-      const pts = (currentMode === 'Positive') ? 10 : -5;
-      if(scores.hasOwnProperty(house)) {
-        scores[house] += pts; 
-        document.getElementById('s-' + house).innerText = scores[house];
-        showToast(`Registered: ${sName} (${pts} pts)`);
-        if(pts > 0) confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        
-        await callAPI({ 
-          action: 'submitPoint', 
-          data: { 
-            dept: currentDept, studentName: sName, teacherName: tName, 
-            category: document.getElementById('p-cat').value, house: house, type: currentMode 
-          } 
+    async function toggleCamera() {
+      const rd = document.getElementById('reader'), btn = document.getElementById('cam-btn');
+      if (rd.style.display === 'none') {
+        rd.style.display = 'block'; btn.innerText = "❌ STOP SCANNER";
+        html5Qr = new Html5Qrcode("reader");
+        html5Qr.start({ facingMode: "environment" }, { fps: 20, qrbox: 250, aspectRatio: 1.0 }, (txt) => {
+          const p = txt.split('|'); 
+          if(p.length >= 3) { 
+            document.getElementById('m-student').value = p[0];
+            showToast("QR Scanned: " + p[0]);
+            stopCam(); submit(p[2]); 
+          }
         });
-      }
+      } else { stopCam(); }
+    }
+
+    function stopCam() {
+      if(html5Qr) html5Qr.stop().then(() => { 
+        document.getElementById('reader').style.display = 'none'; 
+        document.getElementById('cam-btn').innerText = "📸 OPEN SCANNER";
+      });
     }
 
     async function loadAdmin() {
-      const d = await callAPI({ action: 'getAdminData' });
-      if(!d) return;
-      let h = `<h3 style="color:var(--neon); margin: 0 0 15px 0;">ADMIN PANEL</h3>
-      <p style="font-size:10px; color:var(--savio);">LIVE DEPARTMENTS: ${d.activeDepartments.join(', ')}</p>
-      
-      <p style="font-size:11px; color:var(--neon); margin-top:20px;">WEEKLY STANDINGS</p>
-      <div class="stat-card">
-        ${d.weeklyHouses.map((hs, i) => `<div class="rank-row"><span>${i+1}. ${hs[0]}</span><b>${hs[1]} pts</b></div>`).join('')}
-      </div>
-
-      <p style="font-size:11px; color:var(--savio); margin-top:20px;">DEPT TOPPERS (WEEKLY)</p>
-      <div class="stat-card">
-        ${d.weeklyWinners.map(w => `
-          <div style="margin-bottom:8px;">
-            <b style="font-size:10px; color:var(--neon)">${w.dept}</b>
-            ${w.toppers.map(t => `<div class="rank-row"><span>${t[0]}</span><button class="btn-cert" onclick="genPDF('${t[0]}','Weekly Topper (${w.dept})')">CERT</button></div>`).join('')}
-          </div>
-        `).join('')}
-      </div>
-
-      <p style="font-size:11px; color:var(--thomas); margin-top:20px;">STAR TEACHERS</p>
-      <div class="stat-card">
-        ${d.starTeachers.map(t => `<div class="rank-row"><span>${t[0]}</span><button class="btn-cert" onclick="genPDF('${t[0]}','Star Teacher of the Week')">CERT</button></div>`).join('')}
-      </div>`;
+      const d = await api({ action: 'getAdminData' });
+      const col = ['#fbff00', '#e5e4e2', '#cd7f32', '#fff'], lbl = ['WINNER', 'RUNNER', '2nd RUNNER', '4th'];
+      let h = `<h2 style="color:var(--neon); text-align:center;">DASHBOARD</h2>`;
+      h += `<div class="stat-card" style="border-left-color:var(--savio)"><b>ACTIVE DEPT OF WEEK:</b><br>${d.activeDeptOfWeek.name} (${d.activeDeptOfWeek.count} Students Active)</div>`;
+      h += `<h3>WEEKLY HOUSES</h3>` + d.weeklyHouses.map((hs, i) => `<div class="stat-card" style="border-left-color:${col[i]}"><div class="rank-row"><b>${lbl[i]}: ${hs[0]}</b><span>${hs[1]} PTS</span></div></div>`).join('');
+      h += `<h3>WEEKLY DEPT TOPPERS</h3>` + d.weeklyDeptToppers.map(t => `<div class="stat-card"><div class="rank-row"><span><b>${t.dept}:</b> ${t.name}</span><button onclick="downloadCert('${t.name}','${t.dept}','${t.house}')" style="background:var(--savio); border:none; padding:5px 10px; border-radius:4px; font-weight:bold;">CERT</button></div></div>`).join('');
+      h += `<h3>STAR TEACHERS</h3><div class="stat-card">${d.starTeachers.map(t => `<div class="rank-row"><span>${t[0]}</span><b>${t[1]} Logs</b></div>`).join('')}</div>`;
+      h += `<hr><h3>ANNUAL DEPT TOP 3</h3>` + d.annualDeptToppers.map(dpt => `<div class="stat-card" style="border-left-color:var(--ruva)"><b>${dpt.dept}</b>${dpt.toppers.map((t, idx) => `<div class="rank-row" style="font-size:12px;"><span>${idx+1}. ${t.name}</span><b>${t.pts}</b></div>`).join('')}</div>`).join('');
       document.getElementById('admin-content').innerHTML = h;
     }
 
-    async function genPDF(n, a) {
-      document.getElementById('pdf-name').innerText = n; 
-      document.getElementById('pdf-award').innerText = a;
-      const cert = document.getElementById('cert-template');
-      const canvas = await html2canvas(cert, { scale: 2, useCORS: true });
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('l', 'mm', 'a4');
+    async function downloadCert(n, d, h) {
+      document.getElementById('cert-name').innerText = n; document.getElementById('cert-dept').innerText = d; document.getElementById('cert-house').innerText = h;
+      const canvas = await html2canvas(document.getElementById('cert-template'), { scale: 2 });
+      const pdf = new jspdf.jsPDF('l', 'mm', [297, 210]);
       pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 297, 210);
-      pdf.save(`Certificate_${n.replace(/\s+/g, '_')}.pdf`);
+      pdf.save(`Cert_${n}.pdf`);
     }
 
-    function showToast(m) { 
-      const t = document.getElementById('toast'); 
-      t.innerText = m; 
-      t.style.display = 'block'; 
-      setTimeout(() => t.style.display='none', 3000); 
-    }
-    
-    function logout() { location.reload(); }
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display='none', 2500); }
   </script>
 </body>
 </html>
