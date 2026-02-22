@@ -1,181 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DON BOSCO G.O.A.T.S</title>
+  <title>DB G.O.A.T.S FINAL</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=Great+Vibes&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     :root { --bosco: #ff0055; --savio: #00d4ff; --ruva: #ffcc00; --thomas: #00ff88; --neon: #fbff00; }
-    body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #000; color: white; min-height: 100vh; background-size: cover; background-attachment: fixed; }
-    .glass { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin: 10px; }
-    .header { display: flex; flex-direction: column; align-items: center; padding: 15px; border-bottom: 2px solid var(--savio); background: rgba(0,0,0,0.9); position: sticky; top: 0; z-index: 100; }
-    .logo-img { height: 45px; } .founder-img { height: 55px; width: 55px; border-radius: 50%; border: 2px solid var(--neon); object-fit: cover; }
-    .session-live { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 5px; }
-    .live-box { background: rgba(255,255,255,0.03); padding: 8px 2px; border-radius: 12px; border: 1px solid; text-align: center; transition: 0.2s; }
-    .live-box b { font-size: 20px; display: block; margin-top: 5px; }
-    input, select { width: 100%; padding: 14px; margin: 8px 0; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
-    .house-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-    .house-btn { padding: 25px 10px; border-radius: 15px; border: none; font-weight: 900; cursor: pointer; color: black; }
-    .btn-main { width: 100%; padding: 16px; border-radius: 12px; background: var(--neon); color: black; font-weight: 900; border: none; cursor: pointer; }
-    .stat-card { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--neon); }
-    .rank-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; }
-    #cert-template { width: 800px; height: 560px; background: white; color: black; position: absolute; left: -9999px; padding: 40px; text-align: center; border: 15px double #8e6d10; box-sizing: border-box; }
-    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; }
-    .mode-btn { flex:1; padding:15px; border-radius:12px; background:#1a1a1a; color:white; border: 2px solid transparent; font-weight:bold; cursor:pointer; }
-    .active-pos { border-color: var(--thomas); background: rgba(0, 255, 136, 0.1); }
-    .active-neg { border-color: var(--bosco); background: rgba(255, 0, 85, 0.1); }
+    body { font-family: 'Poppins', sans-serif; margin: 0; background: #000; background-size: cover; color: white; background-attachment: fixed; }
+    .glass { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin: 10px; }
+    .header { display: flex; flex-direction: column; align-items: center; padding: 15px; border-bottom: 2px solid var(--savio); background: #000; position: sticky; top: 0; z-index: 1000; }
+    .logo-img { height: 50px; } .founder-img { height: 65px; width: 65px; border-radius: 50%; border: 2px solid var(--neon); object-fit: cover; }
+    input, select { width: 100%; padding: 15px; margin: 10px 0; background: #111; color: white; border: 1px solid #333; border-radius: 12px; box-sizing: border-box; }
+    .house-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+    .house-btn { padding: 30px 10px; border-radius: 15px; border: none; font-weight: 900; color: #000; cursor: pointer; }
+    .btn-main { width: 100%; padding: 15px; border-radius: 12px; background: var(--neon); color: black; font-weight: 900; border: none; cursor: pointer; }
+    .stat-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 5px solid var(--neon); }
+    .rank-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .btn-cert { background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; }
+    #reader { width: 100%; border-radius: 15px; overflow:hidden; display: none; margin: 10px 0; border: 2px solid var(--neon); }
+    #cert-template { width: 1122px; height: 794px; background: white; color: black; position: absolute; left: -9999px; padding: 60px; text-align: center; border: 25px double #8e6d10; box-sizing: border-box; }
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neon); color: black; padding: 15px 30px; border-radius: 50px; display: none; z-index: 5000; font-weight: 900; }
   </style>
 </head>
 <body onload="initApp()">
-  <div id="loading" class="loading-overlay"><b>CONNECTING...</b></div>
+  <div id="toast"></div>
+
   <div class="header">
-    <div style="display:flex; gap:15px;"><img id="main-logo" class="logo-img"><img id="main-founder" class="founder-img"></div>
-    <div style="font-weight:900; font-size:14px; margin-top:5px;">DON BOSCO G.O.A.T.S</div>
+    <div style="display:flex; gap:20px; align-items:center;"><img id="main-logo" class="logo-img"><img id="main-founder" class="founder-img"></div>
+    <div style="font-weight:900; font-size:15px; margin-top:10px; text-align:center;">DON BOSCO POLYTECHNIC COLLEGE<br><span style="color:var(--neon); font-size:11px;">G.O.A.T.S MANAGEMENT</span></div>
   </div>
 
-  <div id="login-view" class="glass" style="max-width:350px; margin: 40px auto;">
+  <div id="login-view" class="glass" style="max-width:400px; margin: 40px auto;">
     <select id="user-select"><option disabled selected>Loading...</option></select>
     <input type="password" id="pass-input" placeholder="Password">
     <button class="btn-main" onclick="login()">LOGIN</button>
   </div>
 
-  <div id="teacher-view" style="display:none;" class="glass">
-    <div class="session-live">
-      <div class="live-box" style="border-color:var(--bosco)"><span style="color:var(--bosco); font-size:9px;">BOSCO</span><b id="s-bosco">0</b></div>
-      <div class="live-box" style="border-color:var(--savio)"><span style="color:var(--savio); font-size:9px;">SAVIO</span><b id="s-savio">0</b></div>
-      <div class="live-box" style="border-color:var(--ruva)"><span style="color:var(--ruva); font-size:9px;">RUVA</span><b id="s-ruva">0</b></div>
-      <div class="live-box" style="border-color:var(--thomas)"><span style="color:var(--thomas); font-size:9px;">THOMAS</span><b id="s-thomas">0</b></div>
+  <div id="teacher-view" style="display:none; max-width:600px; margin: auto;" class="glass">
+    <div style="text-align:center; color:var(--neon); font-weight:900; margin-bottom:15px;">LOGIN SESSION SCOREBOARD</div>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px;">
+      <div style="text-align:center; font-size:11px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--bosco)">BOSCO<br><b id="s-Bosco" style="font-size:18px;">0</b></div>
+      <div style="text-align:center; font-size:11px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--savio)">SAVIO<br><b id="s-Savio" style="font-size:18px;">0</b></div>
+      <div style="text-align:center; font-size:11px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--ruva)">RUVA<br><b id="s-Ruva" style="font-size:18px;">0</b></div>
+      <div style="text-align:center; font-size:11px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--thomas)">THOMAS<br><b id="s-Thomas" style="font-size:18px;">0</b></div>
     </div>
-    <p style="text-align:center; font-size:10px; opacity:0.5;">SESSION POINTS</p>
-    <div id="reader" style="width: 100%; display:none; border-radius:12px; margin:10px 0; overflow:hidden;"></div>
-    <button id="scan-btn" class="btn-main" style="background:var(--savio); margin:10px 0;" onclick="startScanner()">📸 SCAN STUDENT QR</button>
-    <input type="text" id="m-student" placeholder="Student Name">
-    <div style="display:flex; gap:10px; margin:10px 0;">
-      <button onclick="setMode('Negative')" id="btn-neg" class="mode-btn">FINE (-5)</button>
-      <button onclick="setMode('Positive')" id="btn-pos" class="mode-btn active-pos">AWARD (+10)</button>
+
+    <div style="display:flex; gap:15px; margin-bottom:20px;">
+      <button class="btn-main" id="btn-neg" onclick="setMode('Negative')" style="background:#ff416c; color:white;">-5</button>
+      <button class="btn-main" id="btn-pos" onclick="setMode('Positive')" style="background:#00b09b; color:white;">+10</button>
     </div>
+
     <div class="house-grid">
-      <button class="house-btn" style="background:var(--bosco)" onclick="submit('Bosco')">BOSCO</button>
-      <button class="house-btn" style="background:var(--savio)" onclick="submit('Savio')">SAVIO</button>
-      <button class="house-btn" style="background:var(--ruva)" onclick="submit('Ruva')">RUVA</button>
-      <button class="house-btn" style="background:var(--thomas)" onclick="submit('Thomas')">THOMAS</button>
+      <button class="house-btn" style="background:var(--bosco)" onclick="processEntry('MANUAL_ENTRY', 'Bosco')">BOSCO</button>
+      <button class="house-btn" style="background:var(--savio)" onclick="processEntry('MANUAL_ENTRY', 'Savio')">SAVIO</button>
+      <button class="house-btn" style="background:var(--ruva)" onclick="processEntry('MANUAL_ENTRY', 'Ruva')">RUVA</button>
+      <button class="house-btn" style="background:var(--thomas)" onclick="processEntry('MANUAL_ENTRY', 'Thomas')">THOMAS</button>
     </div>
+
+    <button onclick="toggleCamera()" style="background:var(--neon); border:none; padding:18px; border-radius:50px; font-weight:900; width:100%;">📷 SCAN QR</button>
+    <div id="reader"></div>
+    
     <input type="text" id="t-name" placeholder="Teacher Name">
-    <button class="btn-main" style="background:#222; color:white; margin-top:10px;" onclick="location.reload()">LOGOUT</button>
+    <select id="p-cat"><option>Quiz/Program</option><option>YouTube</option><option>Assembly</option><option>Discipline</option></select>
+    <button class="btn-main" style="background:#333; color:white; margin-top:20px;" onclick="location.reload()">LOGOUT</button>
   </div>
 
-  <div id="admin-view" style="display:none;" class="glass">
+  <div id="admin-view" style="display:none; max-width:850px; margin: auto;" class="glass">
     <div id="admin-content"></div>
-    <button class="btn-main" onclick="location.reload()" style="margin-top:20px;">LOGOUT</button>
+    <button class="btn-main" onclick="location.reload()" style="margin-top:20px;">LOGOUT ADMIN</button>
   </div>
 
   <div id="cert-template">
-    <h1 style="margin:0; font-size:30px;">DON BOSCO POLYTECHNIC COLLEGE</h1>
-    <h2 id="cert-type" style="font-family:'Great Vibes'; font-size:45px; color:#8e6d10; margin:10px 0;">Certificate of Merit</h2>
-    <h1 id="cert-name" style="font-size:38px; text-decoration:underline; margin:20px 0;"></h1>
-    <p style="font-size:18px;">of <b id="cert-house"></b> House</p>
-    <h2 id="cert-dept" style="color:#8e6d10;"></h2>
+    <div style="display:flex; justify-content:space-between; align-items:center;"><img id="cert-logo" style="height:100px;"><img id="cert-founder" style="height:100px; width:100px; border-radius:50%;"></div>
+    <h1 style="font-size:38px; margin:20px 0 0 0;">DON BOSCO POLYTECHNIC COLLEGE</h1>
+    <h2 style="font-family:'Great Vibes', cursive; font-size:60px; color:#8e6d10; margin:10px 0;">Certificate of Achievement</h2>
+    <p style="font-size:20px;">This is to certify that</p>
+    <h2 id="pdf-name" style="font-size:45px; text-decoration:underline; margin:10px 0;"></h2>
+    <p style="font-size:20px;">from <b><span id="pdf-dept"></span></b> Dept | <b><span id="pdf-house"></span></b> House</p>
+    <h3 id="pdf-award" style="font-size:28px; color:#8e6d10; margin:10px 0;"></h3>
+    <div style="display:flex; justify-content:space-between; margin-top:60px; padding: 0 80px;">
+      <div style="border-top:2px solid #333; width:220px; padding-top:10px;"><b>OFFICE SEAL</b></div>
+      <div style="text-align:center;">
+        <img id="cert-sig" style="height:70px;"><br>
+        <div style="border-top:2px solid #333; width:220px; padding-top:10px;"><b>PRINCIPAL</b></div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJDl2t9-UBHP7wjaggnB3e9ocrMwyEEdKRH7g4k2-1MuZjSN48JCeLWXkYM1iRA886/exec";
-    let curMode = "Positive", curDept = "", html5QrCode, sessionScores = { Bosco:0, Savio:0, Ruva:0, Thomas:0 };
+    const API_URL = "https://script.google.com/macros/s/AKfycbzap4gRgh9HzevuVwZvombMGxAI45V-MUM5Ny60m4ccRAjNbXHtdgP_AdwGLmiySvaF/exec"; // PASTE WEB APP URL HERE
+    let currentMode = "Positive", currentDept = "", html5QrCode = null, sessionScores = {Bosco:0, Savio:0, Ruva:0, Thomas:0}, studentMeta = {};
 
-    async function api(p, silent=false) {
-      if(!silent) document.getElementById('loading').style.display = 'flex';
-      const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(p) });
-      const d = await r.json();
-      if(!silent) document.getElementById('loading').style.display = 'none';
-      return d;
+    async function callAPI(data) {
+      const r = await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
+      return await r.json();
     }
 
     async function initApp() {
-      const d = await api({ action: 'getInitialData' });
-      document.body.style.backgroundImage = `url('${d.images.thumbBg}')`;
-      document.getElementById('main-logo').src = d.images.thumbLogo;
-      document.getElementById('main-founder').src = d.images.thumbFounder;
-      let s = document.getElementById('user-select');
-      d.departments.forEach(dept => s.add(new Option(dept, dept)));
+      const imgs = await callAPI({action: "getImages"});
+      document.body.style.backgroundImage = `url('${imgs.bg}')`;
+      document.getElementById('main-logo').src = document.getElementById('cert-logo').src = imgs.logo;
+      document.getElementById('main-founder').src = document.getElementById('cert-founder').src = imgs.founder;
+      document.getElementById('cert-sig').src = imgs.signature;
+
+      const list = await callAPI({action: "getDeptList"});
+      const s = document.getElementById('user-select');
+      s.innerHTML = '<option disabled selected>Select Department</option>';
+      list.forEach(d => s.add(new Option(d, d)));
     }
 
     async function login() {
       const u = document.getElementById('user-select').value, p = document.getElementById('pass-input').value;
-      const r = await api({ action: 'login', user: u, pass: p });
+      const r = await callAPI({action: "authenticate", user: u, pass: p});
       if(r.success) {
         document.getElementById('login-view').style.display='none';
-        if(r.role === 'Admin') { document.getElementById('admin-view').style.display='block'; loadAdmin(); }
-        else { document.getElementById('teacher-view').style.display='block'; curDept = r.dept; }
-      } else alert("Access Denied");
+        if(r.role === 'Admin') { document.getElementById('admin-view').style.display='block'; loadAdmin(); } 
+        else { document.getElementById('teacher-view').style.display='block'; currentDept = r.dept; }
+      } else alert("Invalid Login");
     }
 
-    function startScanner() {
-      document.getElementById('reader').style.display = 'block';
-      html5QrCode = new Html5Qrcode("reader");
-      html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-        const parts = text.split('|');
-        document.getElementById('m-student').value = parts[0];
-        stopScanner();
-      });
+    function setMode(m) { currentMode = m; document.getElementById('btn-pos').style.opacity = m === 'Positive' ? '1' : '0.5'; }
+
+    async function toggleCamera() {
+      const reader = document.getElementById('reader');
+      if(reader.style.display === 'none') {
+        reader.style.display = 'block';
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (t) => {
+          const p = t.split('|'); 
+          if(p.length >= 3) { processEntry(p[0], p[2], p[1]); stopCam(); }
+        });
+      } else { stopCam(); }
     }
+    function stopCam() { if(html5QrCode) html5QrCode.stop(); document.getElementById('reader').style.display='none'; }
 
-    function stopScanner() { if(html5QrCode) html5QrCode.stop(); document.getElementById('reader').style.display = 'none'; }
-
-    function setMode(m) {
-      curMode = m;
-      document.getElementById('btn-pos').className = (m === 'Positive') ? 'mode-btn active-pos' : 'mode-btn';
-      document.getElementById('btn-neg').className = (m === 'Negative') ? 'mode-btn active-neg' : 'mode-btn';
-    }
-
-    async function submit(house) {
-      const name = document.getElementById('m-student').value, t = document.getElementById('t-name').value;
-      if(!name || !t) return alert("Enter Student & Teacher Name");
-      const pts = (curMode === 'Positive' ? 10 : -5);
-      sessionScores[house] += pts;
-      document.getElementById(`s-${house.toLowerCase()}`).innerText = sessionScores[house];
-      api({ action: 'submitPoint', data: { dept: curDept, studentName: name, teacherName: t, house: house, type: curMode } }, true);
-      document.getElementById('m-student').value = "";
+    async function processEntry(name, house, dept = "") {
+      const t = document.getElementById('t-name').value;
+      if(!t) return alert("Enter Teacher Name");
+      const h = house.charAt(0).toUpperCase() + house.slice(1).toLowerCase();
+      const pts = currentMode === 'Positive' ? 10 : -5;
+      
+      if(sessionScores.hasOwnProperty(h)) {
+        sessionScores[h] += pts;
+        document.getElementById('s-'+h).innerText = sessionScores[h];
+        showToast(`${name}: ${pts} pts`);
+        if(pts > 0) confetti({ particleCount: 50 });
+        await callAPI({action: "submitPoint", data: { dept: currentDept, studentDept: dept, studentName: name, teacherName: t, category: document.getElementById('p-cat').value, house: h, type: currentMode }});
+      }
     }
 
     async function loadAdmin() {
-      const d = await api({ action: 'getAdminData' });
-      const labels = ["🏆 WINNER", "🥈 RUNNER", "🥉 2nd RUNNER", "4th"];
-      let h = `<div class="stat-card" style="border-left-color:var(--savio)"><b>🔥 WEEKLY ACTIVE DEPT:</b> <span style="float:right">${d.weeklyActiveDept[0]} (${d.weeklyActiveDept[1]} Logs)</span></div>`;
+      const d = await callAPI({action: "getAdminData"});
+      studentMeta = d.meta;
+      const houseRow = (label, data) => `<div class="rank-row"><span>${label}</span><b>${data[0]} (${data[1]})</b></div>`;
       
-      const renderHouses = (list, title, color) => {
-        let s = `<h3 style="color:${color}">${title}</h3><div class="stat-card">`;
-        list.forEach((house, i) => s += `<div class="rank-row"><b>${labels[i]}</b> <span>${house[0]}: ${house[1]} pts</span></div>`);
-        return s + `</div>`;
-      };
-      h += renderHouses(d.weeklyHouses, "WEEKLY HOUSE STANDINGS", "var(--savio)");
-      h += renderHouses(d.annualHouses, "ANNUAL HOUSE STANDINGS", "var(--ruva)");
-
-      h += `<h3>WEEKLY DEPT WINNERS</h3>`;
-      d.weeklyToppers.forEach(dt => { if(dt.top[0]) h += `<div class="stat-card" style="border-left-color:var(--thomas)"><b>${dt.dept}</b><div class="rank-row"><span>🥇 ${dt.top[0].name} (${dt.top[0].pts})</span><button onclick="downloadCert('${dt.top[0].name}','${dt.dept}','${dt.top[0].house}','Weekly Winner')" style="background:var(--thomas); border:none; padding:4px; border-radius:4px; font-weight:bold;">CERT</button></div></div>`; });
-
-      h += `<h3>ANNUAL DEPT TOP 3</h3>`;
-      d.annualToppers.forEach(dt => {
-        let s = `<div class="stat-card" style="border-left-color:var(--ruva)"><b>${dt.dept}</b>`;
-        dt.top.forEach((st, i) => s += `<div class="rank-row"><span>${i+1}. ${st.name} (${st.pts})</span><button onclick="downloadCert('${st.name}','${dt.dept}','${st.house}','Annual Top 3')" style="background:var(--ruva); border:none; padding:4px; border-radius:4px; font-weight:bold;">CERT</button></div>`);
-        h += s + `</div>`;
-      });
-
-      h += `<h3>TOP 5 STAR TEACHERS</h3><div class="stat-card">`;
-      d.starTeachers.forEach((t,i) => h += `<div class="rank-row"><span>${i+1}. ${t[0]}</span><b>${t[1]} Logs</b></div>`);
-      document.getElementById('admin-content').innerHTML = h + `</div>`;
+      let h = `<h3>ANNUAL HOUSE STANDINGS</h3><div class="stat-card">
+        ${houseRow("🥇 WINNER", d.yearlyHouses[0])}${houseRow("🥈 RUNNER", d.yearlyHouses[1])}${houseRow("🥉 2ND RUNNER", d.yearlyHouses[2])}
+      </div>
+      <h3>WEEKLY HOUSE STANDINGS</h3><div class="stat-card">
+        ${houseRow("🥇 WINNER", d.weeklyHouses[0])}${houseRow("🥈 RUNNER", d.weeklyHouses[1])}${houseRow("🥉 2ND RUNNER", d.weeklyHouses[2])}
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div><h4>ANNUAL TOP 3 DEPT</h4>${renderToppers(d.yearlyDeptToppers, "Annual Topper")}</div>
+        <div><h4>WEEKLY TOP 3 DEPT</h4>${renderToppers(d.weeklyDeptToppers, "Weekly Topper")}</div>
+      </div>`;
+      document.getElementById('admin-content').innerHTML = h;
     }
 
-    async function downloadCert(n, d, h, type) {
-      document.getElementById('cert-name').innerText = n; document.getElementById('cert-dept').innerText = d; 
-      document.getElementById('cert-house').innerText = h; document.getElementById('cert-type').innerText = type;
-      const canvas = await html2canvas(document.getElementById('cert-template'), { scale: 2 });
-      const pdf = new jspdf.jsPDF('l', 'mm', [297, 210]);
+    function renderToppers(list, type) {
+      return list.map(d => `<div class="stat-card" style="font-size:12px;"><b>${d.dept}</b>
+        ${d.toppers.map(t => `<div class="rank-row"><span>${t[0]}</span><button class="btn-cert" onclick="genPDF('${t[0]}','${type}','${d.dept}')">CERT</button></div>`).join('')}
+      </div>`).join('');
+    }
+
+    async function genPDF(n, a, d) {
+      const meta = studentMeta[n.toUpperCase()] || {house: "N/A"};
+      document.getElementById('pdf-name').innerText = n.toUpperCase();
+      document.getElementById('pdf-award').innerText = a;
+      document.getElementById('pdf-dept').innerText = d;
+      document.getElementById('pdf-house').innerText = meta.house;
+      const canvas = await html2canvas(document.getElementById('cert-template'), { scale: 2, useCORS: true });
+      const pdf = new jspdf.jsPDF('l', 'mm', 'a4');
       pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 297, 210);
       pdf.save(`Cert_${n}.pdf`);
     }
+
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display='none', 2500); }
   </script>
 </body>
 </html>
