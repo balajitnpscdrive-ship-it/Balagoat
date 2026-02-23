@@ -1,10 +1,13 @@
-const CACHE_NAME = 'balagoat-v1';
+const CACHE_NAME = 'ultimate-goats-v2';
 
-// List of files to cache for offline use
-const ASSETS = [
-  '/Balagoat/',
-  '/Balagoat/index.html',
-  // External Fonts and Libraries
+// Assets to cache for instant offline loading
+const ASSETS_TO_CACHE = [
+  '/Ultimate-goats/',
+  '/Ultimate-goats/index.html',
+  '/Ultimate-goats/manifest.json',
+  '/Ultimate-goats/icon-192.png',
+  '/Ultimate-goats/icon-512.png',
+  // External Libraries & Fonts
   'https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=Great+Vibes&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
@@ -12,38 +15,58 @@ const ASSETS = [
   'https://unpkg.com/html5-qrcode'
 ];
 
-// 1. Install Event: Saves assets to the browser cache
+// 1. Install Event: Save everything to the phone's memory
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching shell assets');
-      return cache.addAll(ASSETS);
+      console.log('Building World-Class Cache...');
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
   self.skipWaiting();
 });
 
-// 2. Activate Event: Cleans up old caches if you update the app
+// 2. Activate Event: Remove old versions of the app
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            console.log('Clearing old system data:', key);
+            return caches.delete(key);
+          }
+        })
       );
     })
   );
   self.clients.claim();
 });
 
-// 3. Fetch Event: Serves files from cache if offline
+// 3. Fetch Event: Serve from cache first, then network
 self.addEventListener('fetch', (event) => {
-  // We don't cache POST requests to the Google Apps Script API
+  // IMPORTANT: Do NOT cache the point submissions (POST requests)
+  // We handle offline points in the index.html using LocalStorage
   if (event.request.method === 'POST') return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Return cached file OR fetch from network
-      return cachedResponse || fetch(event.request);
+      if (cachedResponse) {
+        return cachedResponse; // Return from cache (instant)
+      }
+      return fetch(event.request).then((networkResponse) => {
+        // Optional: Add new successful requests to cache
+        if (networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      }).catch(() => {
+        // If everything fails (No cache, No internet)
+        console.log('Teacher is completely offline and resource not cached.');
+      });
     })
   );
 });
