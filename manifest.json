@@ -1,11 +1,12 @@
 {
-  "name": "Bala G.O.A.T.S App",
-  "short_name": "BalaGoat",
+  "name": "DB G.O.A.T.S Management",
+  "short_name": "Balagoat",
+  "description": "Don Bosco Polytechnic College G.O.A.T.S Management & Certificate System",
   "start_url": "/Balagoat/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "theme_color": "#007bff",
-  "description": "PWA for G.O.A.T.S Management",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-192.png",
