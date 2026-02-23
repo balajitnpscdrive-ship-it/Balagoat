@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="manifest" href="/Balagoat/manifest.json">
+<meta name="theme-color" content="#007bff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/Balagoat/sw.js')
+        .then(reg => console.log('Service Worker Registered for Balagoat'))
+        .catch(err => console.log('Service Worker Failed', err));
+    });
+  }
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DB G.O.A.T.S FINAL</title>
