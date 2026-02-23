@@ -1,14 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="/Balagoat/manifest.json">
-<meta name="theme-color" content="#007bff">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<script>
+  <link rel="manifest" href="/Ultimate-goats/manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <title>DB G.O.A.T.S FINAL</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=Great+Vibes&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    :root { --bosco: #ff0055; --savio: #00d4ff; --ruva: #ffcc00; --thomas: #00ff88; --neon: #fbff00; }
+    body { font-family: 'Poppins', sans-serif; margin: 0; background: #000; background-size: cover; color: white; background-attachment: fixed; }
+    
+    .glass { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin: 10px; }
+    
+    .header { display: flex; flex-direction: column; align-items: center; padding: 15px; border-bottom: 2px solid var(--savio); background: #000; position: sticky; top: 0; z-index: 1000; }
+    .logo-img { height: 50px; } 
+    .founder-img { height: 65px; width: 65px; border-radius: 50%; border: 2px solid var(--neon); object-fit: cover; }
+    
+    /* Connection Status Styles */
+    #sync-indicator { font-size: 10px; margin-top: 8px; display: flex; align-items: center; gap: 5px; }
+    #sync-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #00ff88; }
+    
+    input, select { width: 100%; padding: 15px; margin: 10px 0; background: #111; color: white; border: 1px solid #333; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
+    .house-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+    .house-btn { padding: 30px 10px; border-radius: 15px; border: none; font-weight: 900; color: #000; cursor: pointer; text-transform: uppercase; }
+    
+    .btn-main { width: 100%; padding: 18px; border-radius: 12px; background: var(--neon); color: black; font-weight: 900; border: none; cursor: pointer; font-size: 16px; }
+    
+    .stat-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 5px solid var(--neon); }
+    .rank-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .btn-cert { background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; }
+    
+    #reader { width: 100%; border-radius: 15px; overflow:hidden; display: none; margin: 10px 0; border: 2px solid var(--neon); }
+    #cert-template { width: 1122px; height: 794px; background: white; color: black; position: absolute; left: -9999px; padding: 60px; text-align: center; border: 25px double #8e6d10; box-sizing: border-box; }
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neon); color: black; padding: 15px 30px; border-radius: 50px; display: none; z-index: 5000; font-weight: 900; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body onload="initApp()">
+  <div id="toast"></div>
+
+  <div class="header">
+    <div style="display:flex; gap:20px; align-items:center;">
+      <img id="main-logo" class="logo-img">
+      <img id="main-founder" class="founder-img">
+    </div>
+    <div style="font-weight:900; font-size:15px; margin-top:10px; text-align:center;">
+      DON BOSCO POLYTECHNIC COLLEGE<br>
+      <span style="color:var(--neon); font-size:11px;">G.O.A.T.S MANAGEMENT</span>
+    </div>
+    <div id="sync-indicator">
+      <div id="sync-status-dot"></div>
+      <span id="status-text">Connecting...</span>
+    </div>
+  </div>
+
+  <div id="login-view" class="glass" style="max-width:400px; margin: 40px auto;">
+    <select id="user-select"><option disabled selected>Loading...</option></select>
+    <input type="password" id="pass-input" placeholder="Password">
+    <button class="btn-main" onclick="login()">LOGIN</button>
+  </div>
+
+  <div id="teacher-view" style="display:none; max-width:600px; margin: auto;" class="glass">
+    <div style="text-align:center; color:var(--neon); font-weight:900; margin-bottom:15px;">SESSION SCOREBOARD</div>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px;">
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--bosco)">BOSCO<br><b id="s-Bosco" style="font-size:18px;">0</b></div>
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--savio)">SAVIO<br><b id="s-Savio" style="font-size:18px;">0</b></div>
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--ruva)">RUVA<br><b id="s-Ruva" style="font-size:18px;">0</b></div>
+      <div style="text-align:center; font-size:10px; background:#111; padding:10px; border-radius:12px; border-top:4px solid var(--thomas)">THOMAS<br><b id="s-Thomas" style="font-size:18px;">0</b></div>
+    </div>
+
+    <div style="display:flex; gap:15px; margin-bottom:20px;">
+      <button class="btn-main" id="btn-neg" onclick="setMode('Negative')" style="background:#ff416c; color:white;">-5 POINTS</button>
+      <button class="btn-main" id="btn-pos" onclick="setMode('Positive')" style="background:#00b09b; color:white; border:2px solid #fff;">+10 POINTS</button>
+    </div>
+
+    <div class="house-grid">
+      <button class="house-btn" style="background:var(--bosco)" onclick="processEntry('MANUAL_ENTRY', 'Bosco')">BOSCO</button>
+      <button class="house-btn" style="background:var(--savio)" onclick="processEntry('MANUAL_ENTRY', 'Savio')">SAVIO</button>
+      <button class="house-btn" style="background:var(--ruva)" onclick="processEntry('MANUAL_ENTRY', 'Ruva')">RUVA</button>
+      <button class="house-btn" style="background:var(--thomas)" onclick="processEntry('MANUAL_ENTRY', 'Thomas')">THOMAS</button>
+    </div>
+
+    <button onclick="toggleCamera()" style="background:var(--neon); border:none; padding:18px; border-radius:50px; font-weight:900; width:100%; cursor:pointer;">📷 SCAN STUDENT QR</button>
+    <div id="reader"></div>
+    
+    <input type="text" id="t-name" placeholder="Teacher Name">
+    <select id="p-cat">
+      <option>Quiz/Program</option>
+      <option>YouTube</option>
+      <option>Assembly</option>
+      <option>Discipline</option>
+    </select>
+    <button class="btn-main" style="background:#333; color:white; margin-top:20px;" onclick="location.reload()">LOGOUT</button>
+  </div>
+
+  <div id="admin-view" style="display:none; max-width:850px; margin: auto;" class="glass">
+    <div id="admin-content"></div>
+    <button class="btn-main" onclick="location.reload()" style="margin-top:20px;">LOGOUT ADMIN</button>
+  </div>
+
+  <div id="cert-template">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <img id="cert-logo" style="height:100px;">
+      <img id="cert-founder" style="height:100px; width:100px; border-radius:50%;">
+    </div>
+    <h1 style="font-size:38px; margin:20px 0 0 0;">DON BOSCO POLYTECHNIC COLLEGE</h1>
+    <h2 style="font-family:'Great Vibes', cursive; font-size:60px; color:#8e6d10; margin:10px 0;">Certificate of Achievement</h2>
+    <p style="font-size:20px;">This is to certify that</p>
+    <h2 id="pdf-name" style="font-size:45px; text-decoration:underline; margin:10px 0;"></h2>
+    <p style="font-size:20px;">from <b><span id="pdf-dept"></span></b> Dept | <b><span id="pdf-house"></span></b> House</p>
+    <h3 id="pdf-award" style="font-size:28px; color:#8e6d10; margin:10px 0;"></h3>
+    <div style="display:flex; justify-content:space-between; margin-top:60px; padding: 0 80px;">
+      <div style="border-top:2px solid #333; width:220px; padding-top:10px;"><b>OFFICE SEAL</b></div>
+      <div style="text-align:center;">
+        <img id="cert-sig" style="height:70px;"><br>
+        <div style="border-top:2px solid #333; width:220px; padding-top:10px;"><b>PRINCIPAL</b></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzap4gRgh9HzevuVwZvombMGxAI45V-MUM5Ny60m4ccRAjNbXHtdgP_AdwGLmiySvaF/exec"; 
     let currentMode = "Positive", currentDept = "", html5QrCode = null, sessionScores = {Bosco:0, Savio:0, Ruva:0, Thomas:0}, studentMeta = {};
 
-    // --- NEW: World Class Feedback (Sound) ---
+    // 1. SOUND & PWA REGISTRATION
     const playSuccessSound = () => {
       try {
         const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -17,29 +140,66 @@
         osc.type = "sine";
         osc.frequency.setValueAtTime(880, context.currentTime); 
         gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
-        osc.connect(gain);
-        gain.connect(context.destination);
-        osc.start();
-        osc.stop(context.currentTime + 0.1);
-      } catch(e) { console.log("Audio feedback error"); }
+        osc.connect(gain); gain.connect(context.destination);
+        osc.start(); osc.stop(context.currentTime + 0.1);
+      } catch(e) {}
     };
 
-    async function callAPI(data) {
-      const r = await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
-      return await r.json();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/Ultimate-goats/sw.js').catch(err => console.log(err));
+      });
     }
 
-    async function initApp() {
-      const imgs = await callAPI({action: "getImages"});
-      document.body.style.backgroundImage = `url('${imgs.bg}')`;
-      document.getElementById('main-logo').src = document.getElementById('cert-logo').src = imgs.logo;
-      document.getElementById('main-founder').src = document.getElementById('cert-founder').src = imgs.founder;
-      document.getElementById('cert-sig').src = imgs.signature;
+    // 2. OFFLINE RESILIENCE LOGIC
+    async function callAPI(data) {
+      if (!navigator.onLine) {
+        saveToPending(data);
+        return { offline: true };
+      }
+      try {
+        const r = await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
+        return await r.json();
+      } catch (e) {
+        saveToPending(data);
+        return { offline: true };
+      }
+    }
 
-      const list = await callAPI({action: "getDeptList"});
-      const s = document.getElementById('user-select');
-      s.innerHTML = '<option disabled selected>Select Department</option>';
-      list.forEach(d => s.add(new Option(d, d)));
+    function saveToPending(data) {
+      let pending = JSON.parse(localStorage.getItem('pendingScans') || "[]");
+      pending.push(data);
+      localStorage.setItem('pendingScans', JSON.stringify(pending));
+      showToast("Offline: Saved to Phone");
+    }
+
+    function updateOnlineStatus() {
+      const dot = document.getElementById('sync-status-dot');
+      const txt = document.getElementById('status-text');
+      if (navigator.onLine) {
+        dot.style.background = "#00ff88";
+        txt.innerText = "System Online";
+      } else {
+        dot.style.background = "#ff416c";
+        txt.innerText = "Offline Mode (Auto-Save)";
+      }
+    }
+
+    // 3. CORE APP LOGIC
+    async function initApp() {
+      updateOnlineStatus();
+      try {
+        const imgs = await callAPI({action: "getImages"});
+        if(imgs.bg) document.body.style.backgroundImage = `url('${imgs.bg}')`;
+        document.getElementById('main-logo').src = document.getElementById('cert-logo').src = imgs.logo;
+        document.getElementById('main-founder').src = document.getElementById('cert-founder').src = imgs.founder;
+        document.getElementById('cert-sig').src = imgs.signature;
+
+        const list = await callAPI({action: "getDeptList"});
+        const s = document.getElementById('user-select');
+        s.innerHTML = '<option disabled selected>Select Department</option>';
+        list.forEach(d => s.add(new Option(d, d)));
+      } catch(e) {}
     }
 
     async function login() {
@@ -65,11 +225,8 @@
         html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, (t) => {
           const p = t.split('|'); 
-          if(p.length >= 3) { 
-            processEntry(p[0], p[2], p[1]); 
-            stopCam(); 
-          }
-        }).catch(err => console.error(err));
+          if(p.length >= 3) { processEntry(p[0], p[2], p[1]); stopCam(); }
+        }).catch(err => alert("Camera Error"));
       } else { stopCam(); }
     }
     
@@ -79,7 +236,6 @@
       const t = document.getElementById('t-name').value;
       if(!t) return alert("Enter Teacher Name");
       
-      // World Class Feedback
       if ("vibrate" in navigator) navigator.vibrate(100);
       playSuccessSound();
 
@@ -100,11 +256,11 @@
       }
     }
 
+    // 4. ADMIN & CERTIFICATE LOGIC
     async function loadAdmin() {
       const d = await callAPI({action: "getAdminData"});
       studentMeta = d.meta;
       const houseRow = (label, data) => `<div class="rank-row"><span>${label}</span><b>${data[0]} (${data[1]})</b></div>`;
-      
       let h = `<h3>ANNUAL HOUSE STANDINGS</h3><div class="stat-card">
         ${houseRow("🥇 WINNER", d.yearlyHouses[0])}${houseRow("🥈 RUNNER", d.yearlyHouses[1])}${houseRow("🥉 2ND RUNNER", d.yearlyHouses[2])}
       </div>
@@ -119,7 +275,7 @@
     }
 
     function renderToppers(list, type) {
-      return list.map(d => `<div class="stat-card" style="font-size:12px;"><b>${d.dept}</b>
+      return list.map(d => `<div class="stat-card" style="font-size:11px;"><b>${d.dept}</b>
         ${d.toppers.map(t => `<div class="rank-row"><span>${t[0]}</span><button class="btn-cert" onclick="genPDF('${t[0]}','${type}','${d.dept}')">CERT</button></div>`).join('')}
       </div>`).join('');
     }
@@ -138,10 +294,25 @@
 
     function showToast(m) { 
       const t = document.getElementById('toast'); 
-      t.innerText = m; 
-      t.style.display = 'block'; 
+      t.innerText = m; t.style.display = 'block'; 
       setTimeout(() => t.style.display='none', 2500); 
-  }
+    }
+
+    // 5. AUTO-SYNC HANDLER
+    window.addEventListener('online', async () => {
+      updateOnlineStatus();
+      let pending = JSON.parse(localStorage.getItem('pendingScans') || "[]");
+      if (pending.length > 0) {
+        showToast(`Syncing ${pending.length} scans...`);
+        for (let data of pending) {
+          try { await fetch(API_URL, { method: "POST", body: JSON.stringify(data) }); } 
+          catch (e) { return; }
+        }
+        localStorage.removeItem('pendingScans');
+        showToast("Sync Complete!");
+      }
+    });
+    window.addEventListener('offline', updateOnlineStatus);
   </script>
 </body>
 </html>
